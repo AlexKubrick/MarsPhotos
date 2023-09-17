@@ -50,24 +50,19 @@ class OverviewFragment : Fragment() {
 
         binding.photosGrid.adapter = photoAdapter
 
-        viewModel.photos.observe(viewLifecycleOwner, Observer { data ->
-            photoAdapter.submitList(data)
-        })
-
         viewModel.status.observe(viewLifecycleOwner, Observer { status ->
             when (status) {
-                MarsApiStatus.LOADING -> {
+                is MarsApiStatus.MarsApiLoading -> {
                     binding.statusImage.visibility = View.VISIBLE
                     binding.statusImage.setImageResource(R.drawable.loading_animation)
                 }
-
-                MarsApiStatus.ERROR -> {
+                is MarsApiStatus.MarsApiError -> {
                     binding.statusImage.visibility = View.VISIBLE
                     binding.statusImage.setImageResource(R.drawable.ic_connection_error)
                 }
-
-                else -> {
+                is MarsApiStatus.MarsApiReady -> {
                     binding.statusImage.visibility = View.GONE
+                    photoAdapter.submitList(status.photos)
                 }
             }
         })
