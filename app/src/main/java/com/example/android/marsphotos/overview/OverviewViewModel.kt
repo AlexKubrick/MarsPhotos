@@ -32,11 +32,11 @@ enum class MarsApiStatus { LOADING, ERROR, DONE }
 class OverviewViewModel : ViewModel() {
 
     // The internal MutableLiveData that stores the status of the most recent request
-    private val _status = MutableLiveData<MarsApiStatus>()
     private val _photos = MutableLiveData<List<MarsPhoto>>()
     val photos: MutableLiveData<List<MarsPhoto>> = _photos
 
     // The external immutable LiveData for the request status
+    private val _status = MutableLiveData<MarsApiStatus>()
     val status: LiveData<MarsApiStatus> = _status
 
     /**

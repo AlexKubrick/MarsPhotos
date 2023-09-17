@@ -22,8 +22,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import com.example.android.marsphotos.R
 import com.example.android.marsphotos.databinding.FragmentOverviewBinding
-import com.example.android.marsphotos.databinding.GridViewItemBinding
 
 /**
  * This fragment shows the the status of the Mars photos web services transaction.
@@ -31,6 +32,7 @@ import com.example.android.marsphotos.databinding.GridViewItemBinding
 class OverviewFragment : Fragment() {
 
     private val viewModel: OverviewViewModel by viewModels()
+    private val photoAdapter = PhotoGridAdapter()
 
     /**
      * Inflates the layout with Data Binding, sets its lifecycle owner to the OverviewFragment
@@ -46,10 +48,30 @@ class OverviewFragment : Fragment() {
         // Allows Data Binding to Observe LiveData with the lifecycle of this Fragment
         binding.lifecycleOwner = this
 
-        // Giving the binding access to the OverviewViewModel
-        binding.viewModel = viewModel
+        binding.photosGrid.adapter = photoAdapter
 
-        binding.photosGrid.adapter = PhotoGridAdapter()
+        viewModel.photos.observe(viewLifecycleOwner, Observer { data ->
+            photoAdapter.submitList(data)
+        })
+
+        viewModel.status.observe(viewLifecycleOwner, Observer { status ->
+            when (status) {
+                MarsApiStatus.LOADING -> {
+                    binding.statusImage.visibility = View.VISIBLE
+                    binding.statusImage.setImageResource(R.drawable.loading_animation)
+                }
+
+                MarsApiStatus.ERROR -> {
+                    binding.statusImage.visibility = View.VISIBLE
+                    binding.statusImage.setImageResource(R.drawable.ic_connection_error)
+                }
+
+                else -> {
+                    binding.statusImage.visibility = View.GONE
+                }
+            }
+        })
+
         return binding.root
     }
 }
